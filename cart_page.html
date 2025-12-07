@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Shopping Cart - BandrWood</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- header section -->
+<header class="header">
+	<a href="index.html" class="back-btn">
+		<i class="fa fa-arrow-left"></i> Continue Shopping
+	</a>
+	<a href="index.html" class="logo">
+		<i class="fa fa-shopping-basket" aria-hidden="true"></i> BandrWood
+	</a>
+</header>
+
+<!-- cart section -->
+<section class="cart-section">
+	<h1 class="cart-heading">Shopping <span>Cart</span></h1>
+
+	<div class="cart-container" id="cartContainer">
+		<!-- Cart Items -->
+		<div class="cart-items" id="cartItems">
+			<!-- Items will be loaded here by JavaScript -->
+		</div>
+
+		<!-- Cart Summary -->
+		<div class="cart-summary">
+			<h3>Order Summary</h3>
+			<div class="summary-row">
+				<span>Subtotal:</span>
+				<span id="subtotal">$0.00</span>
+			</div>
+			<div class="summary-row">
+				<span>Shipping:</span>
+				<span id="shipping">$5.00</span>
+			</div>
+			<div class="summary-row">
+				<span>Tax (8%):</span>
+				<span id="tax">$0.00</span>
+			</div>
+			<div class="summary-row total">
+				<span>Total:</span>
+				<span id="total">$0.00</span>
+			</div>
+			<button class="btn checkout-btn" onclick="checkout()">
+				<i class="fa fa-credit-card"></i> Proceed to Checkout
+			</button>
+			<a href="index.html" class="continue-shopping">
+				<i class="fa fa-arrow-left"></i> Continue Shopping
+			</a>
+		</div>
+	</div>
+</section>
+
+<script>
+	// Cart data structure
+	let cart = [];
+
+	// Load cart from URL parameters or local storage
+	function loadCart() {
+		const urlParams = new URLSearchParams(window.location.search);
+		const productName = urlParams.get('product');
+		const quantity = urlParams.get('quantity');
+		const price = urlParams.get('price');
+
+		// Try to load existing cart from sessionStorage
+		const savedCart = sessionStorage.getItem('cart');
+		if (savedCart) {
+			cart = JSON.parse(savedCart);
+		}
+
+		// If new item added via URL, add it to cart
+		if (productName && quantity && price) {
+			addItemToCart(productName, parseInt(quantity), parseFloat(price));
+		}
+
+		renderCart();
+	}
+
+	// Add item to cart
+	function addItemToCart(name, quantity, price) {
+		const existingItem = cart.find(item => item.name === name);
+		
+		if (existingItem) {
+			existingItem.quantity += quantity;
+		} else {
+			cart.push({
+				name: name,
+				quantity: quantity,
+				price: price,
+				image: getProductImage(name)
+			});
+		}
+
+		saveCart();
+	}
+
+	// Get product image based on name
+	function getProductImage(name) {
+		const images = {
+			'Fresh Orange': '/products/orange.png',
+			'Premium Fresh Beef': '/products/meat.png',
+			'Fresh Lemon': '/products/lemon.png',
+			'Fresh Carrot': '/products/carrot.png'
+		};
+		return images[name];
+	}
+
+	// Save cart to sessionStorage
+	function saveCart() {
+		sessionStorage.setItem('cart', JSON.stringify(cart));
+	}
+
+	// Render cart items
+	function renderCart() {
+		const cartItemsContainer = document.getElementById('cartItems');
+		
+		if (cart.length === 0) {
+			cartItemsContainer.innerHTML = `
+				<div class="empty-cart">
+					<i class="fa fa-shopping-cart"></i>
+					<h3>Your Cart is Empty</h3>
+					<p>Looks like you haven't added any items to your cart yet.</p>
+					<a href="index.html" class="btn">Start Shopping</a>
+				</div>
+			`;
+			updateSummary();
+			return;
+		}
+
+		cartItemsContainer.innerHTML = cart.map((item, index) => `
+			<div class="cart-item">
+				<img src="${item.image}" alt="${item.name}">
+				<div class="cart-item-details">
+					<h3>${item.name}</h3>
+					<div class="cart-item-price">$${item.price.toFixed(2)}</div>
+					<div class="quantity-controls">
+						<button onclick="decreaseQuantity(${index})">-</button>
+						<input type="number" value="${item.quantity}" readonly>
+						<button onclick="increaseQuantity(${index})">+</button>
+					</div>
+				</div>
+				<i class="fa fa-trash cart-item-remove" onclick="removeItem(${index})"></i>
+			</div>
+		`).join('');
+
+		updateSummary();
+	}
+
+	// Update cart summary
+	function updateSummary() {
+		const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+		const shipping = cart.length > 0 ? 5.00 : 0;
+		const tax = subtotal * 0.08;
+		const total = subtotal + shipping + tax;
+
+		document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+		document.getElementById('shipping').textContent = `$${shipping.toFixed(2)}`;
+		document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
+		document.getElementById('total').textContent = `$${total.toFixed(2)}`;
+	}
+
+	// Increase quantity
+	function increaseQuantity(index) {
+		if (cart[index].quantity < 10) {
+			cart[index].quantity++;
+			saveCart();
+			renderCart();
+		}
+	}
+
+	// Decrease quantity
+	function decreaseQuantity(index) {
+		if (cart[index].quantity > 1) {
+			cart[index].quantity--;
+			saveCart();
+			renderCart();
+		}
+	}
+
+	// Remove item
+	function removeItem(index) {
+		if (confirm('Remove this item from cart?')) {
+			cart.splice(index, 1);
+			saveCart();
+			renderCart();
+		}
+	}
+
+	// Checkout function
+	function checkout() {
+		if (cart.length === 0) {
+			alert('Your cart is empty!');
+			return;
+		}
+		
+		const total = document.getElementById('total').textContent;
+		alert(`Thank you for your order!\nTotal: ${total}\n\nThis is a demo. Payment processing would happen here.`);
+		
+		// Clear cart after checkout
+		cart = [];
+		saveCart();
+		renderCart();
+	}
+
+	// Initialize cart on page load
+	window.onload = loadCart;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Product Details - BandrWood</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+	<a href="index.html" class="back-btn">
+		<i class="fa fa-arrow-left"></i> Back to Shop
+	</a>
+	<a href="index.html" class="logo">
+		<i class="fa fa-shopping-basket"></i> BandrWood
+	</a>
+
+	<div class="icons">
+		<a href="cart_page.html"><div class="fa fa-shopping-cart"></div></a>
+		<a href="login.html"><div class="fa fa-user"></div></a>
+	</div>
+</header>
+
+<section class="product-details">
+	<div class="product-container">
+
+		<div class="product-images">
+			<div class="main-image">
+				<img src="products/lemon.png" alt="Fresh Lemon" id="mainImage">
+			</div>
+		</div>
+
+		<!-- Product Info -->
+		<div class="product-info">
+			<h1>Fresh Lemon</h1>
+			<div class="product-price">
+				<span class="current-price">$14.99</span>
+			</div>
+
+			<div class="product-description">
+				<h3>Product Description</h3>
+				<p>Fresh and zesty lemons packed with bold citrus flavor. Naturally rich in Vitamin C and cleansing antioxidants, these lemons are ideal for fresh lemonade, marinades, teas, and everyday cooking. Carefully sourced to guarantee freshness, juiciness, and vibrant yellow color in every piece.</p>
+			</div>
+
+			<div class="product-options">
+				<div class="option-group">
+					<h4>Quantity</h4>
+					<div class="quantity-selector">
+						<div class="quantity-controls">
+							<button onclick="decreaseQuantity()">-</button>
+							<input type="number" id="quantity" value="1" min="1" max="10" readonly>
+							<button onclick="increaseQuantity()">+</button>
+						</div>
+						<span style="font-size: 1.6rem; color: var(--light-color);">Per kg</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="action-buttons">
+				<button class="btn btn-add-cart" onclick="addToCart()">
+					<i class="fa fa-shopping-cart"></i> Add to Cart
+				</button>
+			</div>
+
+			<div class="product-meta">
+				<div class="meta-item">
+					<strong>Category:</strong>
+					<span>Fresh Fruits</span>
+				</div>
+				<div class="meta-item">
+					<strong>Availability:</strong>
+					<span style="color: var(--green);">In Stock</span>
+				</div>
+				<div class="meta-item">
+					<strong>SKU:</strong>
+					<span>LEM-002</span>
+				</div>
+				<div class="meta-item">
+					<strong>Tags:</strong>
+					<span>Organic, Citrus, Vitamin C, Fresh</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	function changeImage(src) {
+		document.getElementById('mainImage').src = src;
+		
+		// Update active thumbnail
+		const thumbnails = document.querySelectorAll('.thumbnail');
+		thumbnails.forEach(thumb => thumb.classList.remove('active'));
+		event.currentTarget.classList.add('active');
+	}
+
+	function increaseQuantity() {
+		const input = document.getElementById('quantity');
+		const currentValue = parseInt(input.value);
+		if (currentValue < 10) {
+			input.value = currentValue + 1;
+		}
+	}
+
+	function decreaseQuantity() {
+		const input = document.getElementById('quantity');
+		const currentValue = parseInt(input.value);
+		if (currentValue > 1) {
+			input.value = currentValue - 1;
+		}
+	}
+
+	function changeImage(src) {
+		document.getElementById('mainImage').src = src;
+
+		const thumbnails = document.querySelectorAll('.thumbnail');
+		thumbnails.forEach(thumb => thumb.classList.remove('active'));
+		event.currentTarget.classList.add('active');
+	}
+
+	function increaseQuantity() {
+		const input = document.getElementById('quantity');
+		const currentValue = parseInt(input.value);
+		if (currentValue < 10) {
+			input.value = currentValue + 1;
+		}
+	}
+
+	function decreaseQuantity() {
+		const input = document.getElementById('quantity');
+		const currentValue = parseInt(input.value);
+		if (currentValue > 1) {
+			input.value = currentValue - 1;
+		}
+	}
+
+	function addToCart() {
+		const quantity = document.getElementById('quantity').value;
+		const name = 'Fresh Lemon';
+		const price = 14.99;
+
+		const url = 'cart_page.html'
+				+ '?product=' + encodeURIComponent(name)
+				+ '&quantity=' + encodeURIComponent(quantity)
+				+ '&price=' + encodeURIComponent(price);
+
+		window.location.href = url;
+	}
+</script>
+
+</body>
+</html>
